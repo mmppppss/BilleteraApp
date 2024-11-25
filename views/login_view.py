@@ -1,17 +1,18 @@
 from flet import Page, Column, Text, TextField, ElevatedButton, AlertDialog, View
 from views.dashboard_view import show_dashboard_view
+from database import validar_credenciales
+
+
 def show_login_view(page):
     def login_clicked(e):
         username = username_field.value
         password = password_field.value
-
-        # Validar credenciales (aquí puedes conectar con tu base de datos)
-        if username == "admin" and password == "1234":
-            # Navegar al dashboard
-            #codigo que viene luego del login
-            show_dashboard_view(page)
+        print(username, password)
+        id = validar_credenciales(username,password)
+        print("ID: ",id)
+        if id:
+            show_dashboard_view(page, id)
         else:
-            # Mostrar un error si las credenciales son incorrectas
             page.dialog = AlertDialog(
                 title=Text("Error de inicio de sesión"),
                 content=Text("Credenciales inválidas, intenta de nuevo."),

@@ -1,6 +1,9 @@
 from flet import View, Text, Column, ElevatedButton, Row, Divider
+from database import getWalletUsuario 
 
-def show_dashboard_view(page):
+def show_dashboard_view(page, id):
+    wallet = getWalletUsuario(id)
+    print(wallet)
     def transfer_clicked(e):
         print("Navegar a Transferir Dinero")
 
@@ -18,10 +21,15 @@ def show_dashboard_view(page):
 
     def settings_clicked(e):
         print("Navegar a Configuración")
-
-    # Simular saldo actual (esto se debería cargar desde la base de datos)
-    current_balance = 1500.00  # Ejemplo de saldo
+    
+    bienvenido_text = Text(f"No deberias ver esto, no hay sesion", size=24, weight="bold")
+    current_balance = 0  # Ejemplo de saldo
     balance_text = Text(f"Saldo actual: ${current_balance:,.2f}", size=36, weight="bold", color="green")
+    if wallet:
+        bienvenido_text = Text(f"Bienvenido, {wallet['username']}", size=24, weight="bold")
+        current_balance = wallet["amount"]
+        balance_text = Text(f"Saldo actual: {wallet['money_abbreviation']}. {current_balance:,.2f}", size=36, weight="bold", color="green")
+
 
     # Crear los botones
     row1 = Row(
@@ -59,6 +67,7 @@ def show_dashboard_view(page):
             controls=[
                 Column(
                     [
+                        bienvenido_text,
                         balance_text,
                         Divider(height=20, color="gray"),
                         row1,

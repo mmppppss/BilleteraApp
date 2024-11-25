@@ -1,7 +1,7 @@
 from flet import app, Page
 from views.login_view import show_login_view
+
 def main(page: Page):
-    # Configuración inicial de la aplicación
     page.title = "Money Transfer App"
     page.vertical_alignment = "center"
     page.horizontal_alignment = "center"
