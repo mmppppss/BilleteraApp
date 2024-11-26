@@ -1,6 +1,7 @@
 import pyodbc
 import os
 from dotenv import load_dotenv
+import hashlib
 
 load_dotenv()
 
@@ -18,7 +19,7 @@ def get_connection():
         conn = pyodbc.connect(CONNECTION_STRING)
         return conn
     except pyodbc.Error as e:
-        print("Error al conectar con la base de datos:", e)
+        print("[000] Error al conectar con la base de datos:", e)
         return None
 
 def validar_credenciales(usuario, contraseña):
@@ -27,13 +28,15 @@ def validar_credenciales(usuario, contraseña):
         cursor = conn.cursor()
         
         # Consultar el usuario en la base de datos
-        query = "SELECT password, id_user FROM [user] WHERE username = ?"
+        query = "SELECT password_hash, id_user FROM [user] WHERE username = ?"
         cursor.execute(query, (usuario))
         
         # Verificar si el usuario existe
         row = cursor.fetchone()
         if row:
-            if row[0] == contraseña: 
+            print(row[0])
+            print(hashlib.md5(contraseña.encode()).hexdigest().upper())
+            if row[0] == hashlib.md5(contraseña.encode()).hexdigest().upper(): 
                 return row[1] # el id
             else:
                 return False
@@ -41,7 +44,7 @@ def validar_credenciales(usuario, contraseña):
             return False
         
     except Exception as e:
-        print("Error al validar las credenciales:", e)
+        print("[001] Error al validar las credenciales:", e)
         return False
 def getWalletUsuario(id_user):
     print("obteniendo billetera de ID: ",id_user)
@@ -53,7 +56,7 @@ def getWalletUsuario(id_user):
         cursor.execute("{CALL obtener_info_wallet (?)}", (id_user))
         result = cursor.fetchone()  
     except Exception as e:
-        print("Error al validar las credenciales:", e)
+        print("[002] Error al validar las credenciales:", e)
         return None
     finally:
         conn.close()
@@ -70,36 +73,43 @@ def getWalletUsuario(id_user):
     else:
         return None
 
-def get_balance():
-    """Obtiene el saldo actual de la billetera."""
+def createUSuarioWallet(username, password, nombre, apellidos, id_money):
     conn = get_connection()
     if not conn:
         return None
-
     cursor = conn.cursor()
     try:
-        cursor.execute("SELECT balance FROM Wallet WHERE id = 1;")
-        row = cursor.fetchone()
-        return row[0] if row else None
-    except Exception as e:
-        print("Error al obtener el saldo:", e)
-        return None
-    finally:
-        conn.close()
-
-def update_balance(amount):
-    """Actualiza el saldo de la billetera."""
-    conn = get_connection()
-    if not conn:
-        return False
-
-    cursor = conn.cursor()
-    try:
-        cursor.execute("UPDATE Wallet SET balance = balance + ? WHERE id = 1;", (amount,))
+        cursor.execute("{CALL crear_usuario_con_wallet (?, ?, ?, ?, ?)}", (username, password, nombre, apellidos, id_money))
         conn.commit()
         return True
     except Exception as e:
-        print("Error al actualizar el saldo:", e)
+        print("[003] Error al crear cuenta:", e)
         return False
     finally:
         conn.close()
+
+def getMoney():
+    conn = get_connection()
+    if not conn:
+        return None
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT * FROM money");
+        result = cursor.fetchall()  
+    except Exception as e:
+        print("[004] Error: ", e)
+        return None
+    finally:
+        conn.close()
+
+    if result:
+        return [{
+                "id": row[0],
+                "name": row[1],
+                "value_relative": row[2],
+                "abrev": row[3],
+        } 
+        for row in result]
+    else:
+        return None
+
