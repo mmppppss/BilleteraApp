@@ -113,3 +113,30 @@ def getMoney():
     else:
         return None
 
+def searchUsers(strBusqueda):
+    conn = get_connection()
+    if not conn:
+        return None
+    cursor = conn.cursor()
+    try:
+        cursor.execute("{CALL buscar_usuario3 (?)}", (strBusqueda))
+        result = cursor.fetchall()  
+    except Exception as e:
+        print("[005] Error: ", e)
+        return None
+    finally:
+        conn.close()
+
+    if result:
+        return [{
+                "id": row[0],
+                "username": row[1],
+                "nombre": row[2],
+                "apellidos": row[3],
+                "id_money": row[4],
+                "id_wallet": row[5],
+        }
+        for row in result]
+    else:
+        return None
+

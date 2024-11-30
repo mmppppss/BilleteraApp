@@ -1,11 +1,11 @@
 from flet import View, Text, Column, ElevatedButton, Row, Divider
 from database import getWalletUsuario 
-
+from views.transfer_view import show_transferir_view
 def show_dashboard_view(page, id):
     wallet = getWalletUsuario(id)
     print(wallet)
     def transfer_clicked(e):
-        print("Navegar a Transferir Dinero")
+        show_transferir_view(page)
 
     def receive_clicked(e):
         print("Navegar a Recibir Dinero")
