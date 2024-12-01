@@ -1,3 +1,4 @@
+from typing import Self
 import pyodbc
 import os
 from dotenv import load_dotenv
@@ -14,6 +15,8 @@ CONNECTION_STRING = (
     f"TrustServerCertificate=yes"
 )
 
+conn=None;
+
 def get_connection():
     try:
         conn = pyodbc.connect(CONNECTION_STRING)
@@ -21,10 +24,11 @@ def get_connection():
     except pyodbc.Error as e:
         print("[000] Error al conectar con la base de datos:", e)
         return None
+conn = get_connection();
 
 def validar_credenciales(usuario, contraseña):
     try:
-        conn = get_connection();
+        #conn = get_connection();
         cursor = conn.cursor()
         
         # Consultar el usuario en la base de datos
@@ -47,8 +51,8 @@ def validar_credenciales(usuario, contraseña):
         print("[001] Error al validar las credenciales:", e)
         return False
 def getWalletUsuario(id_user):
-    print("obteniendo billetera de ID: ",id_user)
-    conn = get_connection()
+    #print("obteniendo billetera de ID: ",id_user)
+    #conn = get_connection()
     if not conn:
         return None
     cursor = conn.cursor()
@@ -58,8 +62,8 @@ def getWalletUsuario(id_user):
     except Exception as e:
         print("[002] Error al validar las credenciales:", e)
         return None
-    finally:
-        conn.close()
+    #finally:
+    #   conn.close()
 
     if result:
         return {
@@ -74,7 +78,7 @@ def getWalletUsuario(id_user):
         return None
 
 def createUSuarioWallet(username, password, nombre, apellidos, id_money):
-    conn = get_connection()
+    #conn = get_connection()
     if not conn:
         return None
     cursor = conn.cursor()
@@ -85,11 +89,11 @@ def createUSuarioWallet(username, password, nombre, apellidos, id_money):
     except Exception as e:
         print("[003] Error al crear cuenta:", e)
         return False
-    finally:
-        conn.close()
+    #finally:
+    #    conn.close()
 
 def getMoney():
-    conn = get_connection()
+    #conn = get_connection()
     if not conn:
         return None
     cursor = conn.cursor()
@@ -99,8 +103,8 @@ def getMoney():
     except Exception as e:
         print("[004] Error: ", e)
         return None
-    finally:
-        conn.close()
+    #finally:
+    #    conn.close()
 
     if result:
         return [{
@@ -114,7 +118,7 @@ def getMoney():
         return None
 
 def searchUsers(strBusqueda):
-    conn = get_connection()
+    #conn = get_connection()
     if not conn:
         return None
     cursor = conn.cursor()
@@ -124,8 +128,8 @@ def searchUsers(strBusqueda):
     except Exception as e:
         print("[005] Error: ", e)
         return None
-    finally:
-        conn.close()
+    #finally:
+    #    conn.close()
 
     if result:
         return [{
