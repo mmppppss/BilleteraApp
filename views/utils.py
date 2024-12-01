@@ -11,8 +11,8 @@ def show_error(page, message):
         page.dialog.open = False
         page.update()
     page.dialog = AlertDialog(
-        title=Text("Error de inicio de sesión"),
-        content=Text("Credenciales inválidas, intenta de nuevo."),
+        title=Text("Error"),
+        content=Text(message),
         actions=[
             ElevatedButton("Cerrar", on_click=close_dialog)
         ],

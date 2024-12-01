@@ -1,49 +1,99 @@
-from flet import View, Text, Column, TextField, Dropdown, ElevatedButton, Row, Divider, dropdown, AlertDialog
+from flet import (
+    View,
+    Text,
+    Column,
+    TextField,
+    Dropdown,
+    ElevatedButton,
+    Row,
+    Divider,
+    dropdown,
+    AlertDialog,
+    IconButton,
+    icons,
+    Page,
+)
 from views.utils import show_message, show_error
-from database import searchUsers, getWalletUsuario
-def show_transferir_view(page):
+from database import searchUsers
+
+def show_transferir_view(page: Page, id):
+
+    def volver_clicked(e):
+        from views.dashboard_view import show_dashboard_view
+        show_dashboard_view(page, id);
+    # Campo de búsqueda y monto
+    usuario_id_field = TextField(label="ID o nombre del usuario destino", width=300)
+    monto_field = TextField(label="Monto a transferir", width=300)
+
+    # Diálogo de búsqueda
+    dialog_search_field = TextField(label="Buscar usuario")
+    dialog_dropdown = Dropdown(label="Resultados de búsqueda", width=400, options=[])
+    buscar_dialog_button = ElevatedButton("Buscar", on_click=None)
+    seleccionar_button = ElevatedButton("Seleccionar", on_click=None)
+    volver_button = ElevatedButton("Volver", on_click=volver_clicked)
+    modal = AlertDialog(
+        title=Text("Buscar Usuario"),
+        content=Column(
+            [
+                dialog_search_field,
+                buscar_dialog_button,
+                dialog_dropdown,
+                Divider(height=10, color="transparent"),
+                seleccionar_button,
+            ],
+            spacing=2,
+            width=400,
+            height=400,
+            alignment="center",
+            horizontal_alignment="center",
+        ),
+        actions=[],
+        open=False,
+    )
+
+    def abrir_dialogo(e):
+        modal.open = True
+        page.dialog = modal
+        page.update()
 
     def realizar_busqueda(e):
-
-        # Simulación de resultados (puedes conectar esto a una base de datos)
-        users = searchUsers(usuario_id_field.value)
+        strBusqueda = dialog_search_field.value
+        users = searchUsers(strBusqueda)
         if users:
-            print(users)
             user_options = [
                 dropdown.Option(key=str(user["id"]), text=f"{user['username']} ({user['nombre']} {user['apellidos']})")
                 for user in users
             ]
-            user_dropdown = Dropdown(
-                label="Seleccionar Usuario",
-                options=user_options,
-                width=400,
-            )
+            dialog_dropdown.options = user_options
+            dialog_dropdown.value = None  # Restablecer selección
+            dialog_dropdown.update()
+        else:
+            show_message(page, "No se encontraron usuarios similares")
 
-            modal.controls = [user_dropdown]
-            modal.open = True
+    def seleccionar_usuario(e):
+        if dialog_dropdown.value:
+            usuario_id_field.value = dialog_dropdown.value
+            modal.open = False
             page.update()
 
+    # Vincular botones del cuadro de diálogo
+    buscar_dialog_button.on_click = realizar_busqueda
+    seleccionar_button.on_click = seleccionar_usuario
 
-    def seleccionar_usuario(user_id):
-        usuario_id_field.value = user_id
-        modal.open = False
-        page.update()
-
+    # Confirmación de transferencia
     def confirmar_transferencia(e):
         usuario_id = usuario_id_field.value
         monto = monto_field.value
         if usuario_id and monto:
-            show_error(page, f"Transfiriendo {monto} al usuario {usuario_id}")
+            show_message(page, f"Transfiriendo {monto} al usuario {usuario_id}")
         else:
             show_message(page, "Complete todos los campos antes de confirmar la transferencia")
 
-    usuario_id_field = TextField(label="ID o nombre del usuario destino", width=300)
-    buscar_button = ElevatedButton("Buscar usuario", on_click=realizar_busqueda)
-    monto_field = TextField(label="Monto a transferir", width=300)
+    # Botón de búsqueda en la vista principal
+    buscar_button = IconButton(icon=icons.SEARCH, on_click=abrir_dialogo)
     confirmar_button = ElevatedButton("Confirmar transferencia", on_click=confirmar_transferencia)
 
-    modal = AlertDialog(title=Text("Buscar Usuario"), open=False)
-
+    # Vista principal
     page.views.clear()
     page.views.append(
         View(
@@ -57,6 +107,7 @@ def show_transferir_view(page):
                         monto_field,
                         Divider(height=20, color="transparent"),
                         confirmar_button,
+                        volver_button,
                     ],
                     spacing=20,
                     alignment="center",
@@ -67,6 +118,5 @@ def show_transferir_view(page):
             horizontal_alignment="center",
         )
     )
-    page.dialog = modal
     page.update()
 
