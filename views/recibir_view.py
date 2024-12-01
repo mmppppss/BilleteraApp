@@ -22,7 +22,11 @@ def show_recibir_view(page, user_info):
     qr_code_image = Image(src_base64=qr_base64, width=200, height=200)
 
     user_text = Text(f"Usuario: {user_info['username']}", size=16, weight="bold")
+    def volver_clicked(e):
+        from views.dashboard_view import show_dashboard_view
+        show_dashboard_view(page, user_info["id_user"]);
 
+    volver_button = ElevatedButton("Volver", on_click=volver_clicked)
     page.views.clear()
     page.views.append(
         View(
@@ -35,6 +39,7 @@ def show_recibir_view(page, user_info):
                         user_text,
                         Divider(height=20, color="transparent"),
                         qr_code_image,
+                        volver_button
                     ],
                     spacing=20,
                     alignment="center",
