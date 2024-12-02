@@ -2,6 +2,8 @@ from flet import View, Text, Column, ElevatedButton, Row, Divider
 from database import getWalletUsuario 
 from views.transfer_view import show_transferir_view
 from views.recibir_view import show_recibir_view
+from views.history_view import show_historial_view
+from views.config_view import show_config_view
 
 def show_dashboard_view(page, id):
     wallet = getWalletUsuario(id)
@@ -19,16 +21,16 @@ def show_dashboard_view(page, id):
         print("Navegar a Depositar desde Banco")
 
     def history_clicked(e):
-        print("Navegar a Historial")
+        show_historial_view(page, id)
 
     def settings_clicked(e):
-        print("Navegar a Configuración")
+        show_config_view(page, wallet)
     
     bienvenido_text = Text(f"No deberias ver esto, no hay sesion", size=24, weight="bold")
     current_balance = 0  # Ejemplo de saldo
     balance_text = Text(f"Saldo actual: ${current_balance:,.2f}", size=36, weight="bold", color="green")
     if wallet:
-        bienvenido_text = Text(f"Bienvenido, {wallet['username']}", size=24, weight="bold")
+        bienvenido_text = Text(f"Bienvenido, {wallet['nombre']}", size=24, weight="bold")
         current_balance = wallet["amount"]
         balance_text = Text(f"Saldo actual: {wallet['money_abbreviation']}. {current_balance:,.2f}", size=36, weight="bold", color="green")
 

@@ -71,8 +71,10 @@ def getWalletUsuario(id_user):
                 "id_user": result[1],
                 "amount": result[2],
                 "username": result[3],
-                "money_name": result[4],
-                "money_abbreviation": result[5],
+                "nombre": result[4],
+                "apellidos": result[5],
+                "money_name": result[6],
+                "money_abbreviation": result[7],
         }
     else:
         return None
