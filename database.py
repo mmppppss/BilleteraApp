@@ -16,7 +16,7 @@ CONNECTION_STRING = (
 )
 
 conn=None;
-
+#hola
 def get_connection():
     try:
         conn = pyodbc.connect(CONNECTION_STRING)
