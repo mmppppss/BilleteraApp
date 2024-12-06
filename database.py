@@ -146,3 +146,17 @@ def searchUsers(strBusqueda):
     else:
         return None
 
+def transferirDinero(id_user, id_user_dest, monto) -> bool:
+    #conn = get_connection()
+    if not conn:
+        return False
+    cursor = conn.cursor()
+    try:
+        cursor.execute("{CALL transferir_dinero (?, ?, ?)}", (id_user, id_user_dest, monto))
+        conn.commit()
+        return True
+    except Exception as e:
+        print("[006] Error al transferir:", e)
+        return False
+    #finally:
+    #    conn.close()

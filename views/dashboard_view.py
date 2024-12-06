@@ -9,7 +9,7 @@ def show_dashboard_view(page, id):
     wallet = getWalletUsuario(id)
     print(wallet)
     def transfer_clicked(e):
-        show_transferir_view(page, id)
+        show_transferir_view(page, wallet)
 
     def receive_clicked(e):
         show_recibir_view(page, wallet)

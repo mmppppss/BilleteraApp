@@ -14,13 +14,13 @@ from flet import (
     Page,
 )
 from views.utils import show_message, show_error
-from database import searchUsers
+from database import searchUsers, transferirDinero
 
-def show_transferir_view(page: Page, id):
+def show_transferir_view(page: Page, wallet):
 
     def volver_clicked(e):
         from views.dashboard_view import show_dashboard_view
-        show_dashboard_view(page, id);
+        show_dashboard_view(page, wallet["id_user"]);
     # Campo de búsqueda y monto
     usuario_id_field = TextField(label="ID o nombre del usuario destino", width=300)
     monto_field = TextField(label="Monto a transferir", width=300)
@@ -82,10 +82,12 @@ def show_transferir_view(page: Page, id):
 
     # Confirmación de transferencia
     def confirmar_transferencia(e):
-        usuario_id = usuario_id_field.value
+        userToId = usuario_id_field.value
         monto = monto_field.value
-        if usuario_id and monto:
-            show_message(page, f"Transfiriendo {monto} al usuario {usuario_id}")
+        if userToId and monto:
+            show_message(page, f"Transfiriendo {monto} al usuario")
+            if transferirDinero(wallet["id_wallet"], userToId, monto):
+                show_message(page, f"Transferencia exitosa")
         else:
             show_message(page, "Complete todos los campos antes de confirmar la transferencia")
 
