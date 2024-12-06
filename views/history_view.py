@@ -3,66 +3,42 @@ from flet import(
         DataColumn, DataRow, DataCell,
         Divider, ElevatedButton, AlertDialog
     )
+from database import obtener_transferencias
 
-def get_transfer_history(user_wallet_id):
-    """
-    simulacion
-    """
-    return [
-        {
-            "id_log": 1,
-            "date": "2024-12-01",
-            "hour": "10:45:00",
-            "id_wallet_from": 101,
-            "id_wallet_to": 102,
-            "amount": 100.50,
-            "ipv4": "192.168.1.1",
-            "browser": "Chrome",
-            "username_to": "JuanPerez",
-        },
-        {
-            "id_log": 2,
-            "date": "2024-12-02",
-            "hour": "15:30:00",
-            "id_wallet_from": 101,
-            "id_wallet_to": 103,
-            "amount": 200.00,
-            "ipv4": "192.168.1.2",
-            "browser": "Firefox",
-            "username_to": "MariaLopez",
-        },
-    ]
+def show_historial_view(page, wallet):
+    transfer_history = obtener_transferencias(wallet["id_wallet"])
 
-
-def show_historial_view(page, user_wallet_id):
-    transfer_history = get_transfer_history(user_wallet_id)
-
-    detail_dialog = AlertDialog(modal=True)
+    detail_dialog = AlertDialog()
 
     def volver_clicked(e):
         from views.dashboard_view import show_dashboard_view
-        show_dashboard_view(page, user_wallet_id)
-    def close_detail_dialog(e):
-        page.dialog = None
-        page.update()
+        show_dashboard_view(page, wallet["id_user"])
+    
     def show_detail(log):
-        detail_dialog.content = Column(
-            [
-                Text(f"ID Log: {log['id_log']}", size=16),
-                Text(f"Fecha: {log['date']}", size=16),
-                Text(f"Hora: {log['hour']}", size=16),
-                Text(f"Wallet Origen: {log['id_wallet_from']}", size=16),
-                Text(f"Wallet Destino: {log['id_wallet_to']}", size=16),
-                Text(f"Monto: ${log['amount']:.2f}", size=16),
-                Text(f"Usuario Destino: {log['username_to']}", size=16),
-                Text(f"IPv4: {log['ipv4']}", size=16),
-                Text(f"Navegador: {log['browser']}", size=16),
+        def close_detail_dialog(e):
+            page.dialog.open = False
+            page.update()
+
+        page.dialog= AlertDialog(
+            title=Text("Detalles de transaccion"),
+            content=Column(
+                [
+                    Text(f"ID Log: {log['id_log']}", size=16),
+                    Text(f"Fecha: {log['date']}", size=16),
+                    Text(f"Hora: {log['hour']}", size=16),
+                    Text(f"Wallet Origen: {log['id_wallet_from']}", size=16),
+                    Text(f"Wallet Destino: {log['id_wallet_to']}", size=16),
+                    Text(f"Monto: ${log['amount']:.2f}", size=16),
+                    Text(f"Usuario Destino: {log['username_to']}", size=16),
+                    Text(f"IPv4: {log['ipv4']}", size=16),
+                    Text(f"Navegador: {log['browser']}", size=16),
+                ],
+            ),
+            actions=[
                 ElevatedButton("OK", on_click=close_detail_dialog),
-            ],
-            spacing=10,
+            ]
         )
-        page.dialog = detail_dialog
-        detail_dialog.open = True
+        page.dialog.open = True;
         page.update()
     rows = [
         DataRow(

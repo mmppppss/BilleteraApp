@@ -160,3 +160,65 @@ def transferirDinero(id_user, id_user_dest, monto) -> bool:
         return False
     #finally:
     #    conn.close()
+
+def retirarDinero(id_wallet, monto, destino, ref) -> bool:
+    #conn = get_connection()
+    if not conn:
+        return False
+    cursor = conn.cursor()
+    try:
+        cursor.execute("{CALL pa_retirar_dinero (?, ?, ?, ?)}", (id_wallet, monto, destino, ref))
+        conn.commit()
+        return True
+    except Exception as e:
+        print("[007] Error al retirar:", e)
+        return False
+    #finally:
+    #    conn.close()
+
+def depositarDinero(id_wallet, monto, origen, ref) -> bool:
+    #conn = get_connection()
+    if not conn:
+        return False
+    cursor = conn.cursor()
+    try:
+        cursor.execute("{CALL pa_depositar_dinero (?, ?, ?, ?)}", (id_wallet, monto, origen, ref))
+        conn.commit()
+        return True
+    except Exception as e:
+        print("[008] Error al retirar:", e)
+        return False
+    #finally:
+    #    conn.close()
+
+
+def obtener_transferencias(id_wallet: int) -> list:
+    #conn = get_connection()  # Obtener conexión a la base de datos
+    if not conn:
+        return []
+
+    cursor = conn.cursor()
+    try:
+        cursor.execute("{CALL pa_obtener_transferencias (?)}", (id_wallet,))
+        rows = cursor.fetchall()
+
+        transferencias = []
+        for row in rows:
+            transferencia = {
+                "id_log": row.id_log,
+                "date": row.date.strftime('%Y-%m-%d'),
+                "hour": row.hour.strftime('%H:%M:%S'),
+                "id_wallet_from": row.id_wallet_from,
+                "id_wallet_to": row.id_wallet_to,
+                "amount": row.amount,
+                "ipv4": row.ipv4,
+                "browser": row.browser,
+                "username_to": row.username_to,
+            }
+            transferencias.append(transferencia)
+
+        return transferencias
+
+    except Exception as e:
+        print("[009] Error al obtener transferencias:", e)
+        return []

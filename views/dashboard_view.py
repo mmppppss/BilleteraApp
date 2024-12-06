@@ -4,7 +4,8 @@ from views.transfer_view import show_transferir_view
 from views.recibir_view import show_recibir_view
 from views.history_view import show_historial_view
 from views.config_view import show_config_view
-
+from views.withdraw_view import show_withdraw_view
+from views.deposit_view import show_deposit_view
 def show_dashboard_view(page, id):
     wallet = getWalletUsuario(id)
     print(wallet)
@@ -15,16 +16,20 @@ def show_dashboard_view(page, id):
         show_recibir_view(page, wallet)
 
     def withdraw_clicked(e):
-        print("Navegar a Retirar a Banco")
+        show_withdraw_view(page, wallet)
 
     def deposit_clicked(e):
-        print("Navegar a Depositar desde Banco")
+        show_deposit_view(page, wallet)
 
     def history_clicked(e):
-        show_historial_view(page, id)
+        show_historial_view(page, wallet)
 
     def settings_clicked(e):
         show_config_view(page, wallet)
+
+    def login_clicked(e):
+        from views.login_view import show_login_view  # Importación dentro de la función
+        show_login_view(page)
     
     bienvenido_text = Text(f"No deberias ver esto, no hay sesion", size=24, weight="bold")
     current_balance = 0  # Ejemplo de saldo
