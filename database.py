@@ -222,3 +222,16 @@ def obtener_transferencias(id_wallet: int) -> list:
     except Exception as e:
         print("[009] Error al obtener transferencias:", e)
         return []
+
+def update_password(user_id, contra_actual, contra_nueva):
+    if not conn:
+        return None
+    cursor = conn.cursor()
+    try:
+        cursor.execute("{CALL pa_actualizar_contraseña (?, ?, ?)}", (user_id, contra_actual,contra_nueva))
+        conn.commit()
+        return True
+    except Exception as e:
+        print("[003] Error al crear cuenta:", e)
+        return False
+

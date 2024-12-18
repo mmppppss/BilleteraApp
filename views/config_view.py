@@ -1,60 +1,80 @@
 from flet import (
-    Page, View, Column, Text, TextField, ElevatedButton, Divider, AlertDialog
+    Text,
+    TextField,
+    ElevatedButton,
+    View,
+    Column,
+    Row,
+    Divider,
+    Page,
 )
-from views.utils import show_error, show_message
+from database import update_password
 
-def show_config_view(page: Page, user_data):
-    username = TextField(label="Nombre de Usuario", value=user_data["username"])
-    nombres = TextField(label="Nombre", value=user_data["nombre"])
-    apellidos = TextField(label="Apellidos", value=user_data["apellidos"])
-    old_password = TextField(label="Contraseña Actual", password=True, can_reveal_password=True)
-    new_password = TextField(label="Nueva Contraseña", password=True, can_reveal_password=True)
-    confirm_password = TextField(label="Confirmar Contraseña", password=True, can_reveal_password=True)
-
-    message_dialog = AlertDialog(modal=True)
+# Función para mostrar la vista de perfil
+def show_config_view(page, user_info):
+    # Campo de mensaje para notificaciones
+    message_text = Text("", color="red")
 
     def save_changes(e):
-        if new_password.value and new_password.value != confirm_password.value:
-            show_message("Error", "La nueva contraseña no coincide con la confirmación.")
+        # Validar contraseñas
+        if new_password_field.value != confirm_password_field.value:
+            message_text.value = "Las contraseñas no coinciden."
+            message_text.color = "red"
+            page.update()
             return
+        
+        print("Guardando cambios...")
+        print(f"Contraseña actual: {current_password_field.value}")
+        print(f"Nueva contraseña: {new_password_field.value}")
+        update_password( user_info["id_user"], current_password_field.value, new_password_field.value);
+        # Feedback al usuario
+        message_text.value = "¡Perfil actualizado con éxito!"
+        message_text.color = "green"
+        page.update()
 
-        updated_data = {
-            "username": username.value,
-            "nombres": nombres.value,
-            "apellidos": apellidos.value,
-            "password": new_password.value if new_password.value else None,
-        }
-        show_message("Éxito", "¡Los cambios se han guardado correctamente!")
+    def cancel_changes(e):
+        # Regresar a la página principal o vista anterior
+        from views.dashboard_view import show_dashboard_view
+        show_dashboard_view(page, user_info["id_user"])
 
+    # Crear campos del formulario
+    current_password_field = TextField(label="Contraseña actual", password=True, width=400)
+    new_password_field = TextField(label="Nueva contraseña", password=True, width=400)
+    confirm_password_field = TextField(label="Confirmar nueva contraseña", password=True, width=400)
+
+    # Botones de acción
+    save_button = ElevatedButton("Guardar cambios", on_click=save_changes)
+    cancel_button = ElevatedButton("Cancelar", on_click=cancel_changes)
+
+    # Agregar los elementos a la vista
     page.views.clear()
     page.views.append(
         View(
-            "/configuracion",
+            "/profile",
             controls=[
                 Column(
                     [
-                        Text("Configuración de la Cuenta", size=24, weight="bold"),
-                        Divider(height=20, color="gray"),
-                        username,
-                        nombres,
-                        apellidos,
-                        Divider(height=20, color="gray"),
-                        Text("Cambiar Contraseña", size=20, weight="bold"),
-                        old_password,
-                        new_password,
-                        confirm_password,
-                        ElevatedButton("Guardar Cambios", on_click=save_changes, bgcolor="blue", color="white"),
+                        Text("Editar perfil", size=24, weight="bold"),
+                        Divider(height=10, color="transparent"),
+                        current_password_field,
+                        new_password_field,
+                        confirm_password_field,
+                        Divider(height=10),
+                        message_text,  # Mensaje de notificación
+                        Divider(height=20),
+                        Row([save_button, cancel_button], alignment="center", spacing=20),
                     ],
-                    spacing=20,
                     alignment="center",
                     horizontal_alignment="center",
-                ),
+                )
             ],
             vertical_alignment="center",
             horizontal_alignment="center",
         )
     )
-    page.dialog = message_dialog
     page.update()
 
-
+# Ejecutar app
+if __name__ == "__main__":
+    import flet as ft
+    ft.app(target=main)
